@@ -68,12 +68,6 @@ const TodoList = () => {
     return (
         <div className="todo-list">
             <h1>To-Do List</h1>
-            <div className="task-header">
-                <span>Task</span>
-                <span>Category</span>
-                <span>Priority</span>
-                <span>Due Date</span>
-            </div>
             <input
                 type="text"
                 value={newTodo}
@@ -96,7 +90,7 @@ const TodoList = () => {
                 <option value="Medium">Medium</option>
                 <option value="Low">Low</option>
             </select>
-            <button onClick={addTodo}>Add</button>
+            <button className="add-btn" onClick={addTodo}>Add</button>
 
             <h2>Search and Filter</h2>
             <input
@@ -118,6 +112,13 @@ const TodoList = () => {
                 <option value="Low">Low</option>
             </select>
 
+            <div className="task-header">
+                <span>Task</span>
+                <span>Category</span>
+                <span>Priority</span>
+                <span>Due Date</span>
+                <span>Action</span>
+            </div>
             <ul>
                 {filteredTodos.map(todo => (
                     <li key={todo.id}>
