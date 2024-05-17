@@ -12,13 +12,15 @@ const TodoList = () => {
     const [filterCategory, setFilterCategory] = useState('');
     const [filterPriority, setFilterPriority] = useState('');
 
+    const baseURL = 'https://to-do-martik-78cca75b2965.herokuapp.com';
+
     useEffect(() => {
         const fetchTodos = async () => {
             try {
-                const response = await axios.get('http://localhost:5001/todos');
+                const response = await axios.get(`${baseURL}/todos`);
                 setTodos(response.data);
             } catch (error) {
-                console.error("Error fetching data:", error);
+                console.error('Error fetching data:', error);
             }
         };
 
@@ -28,12 +30,7 @@ const TodoList = () => {
     const addTodo = async () => {
         if (!newTodo.trim()) return;
         try {
-            const response = await axios.post('http://localhost:5001/todos', {
-                text: newTodo,
-                due_date: dueDate,
-                category: category,
-                priority: priority
-            });
+            const response = await axios.post(`${baseURL}/todos`, { text: newTodo, due_date: dueDate, category, priority });
             setTodos([...todos, response.data]);
             setNewTodo('');
             setDueDate('');
@@ -46,7 +43,7 @@ const TodoList = () => {
 
     const toggleComplete = async (id, completed) => {
         try {
-            const response = await axios.put(`http://localhost:5001/todos/${id}`, { completed: !completed });
+            const response = await axios.put(`${baseURL}/todos/${id}`, { completed: !completed });
             setTodos(todos.map(todo => (todo.id === id ? response.data : todo)));
         } catch (error) {
             console.error("Error toggling complete:", error);
@@ -55,7 +52,7 @@ const TodoList = () => {
 
     const deleteTodo = async (id) => {
         try {
-            await axios.delete(`http://localhost:5001/todos/${id}`);
+            await axios.delete(`${baseURL}/todos/${id}`);
             setTodos(todos.filter(todo => todo.id !== id));
         } catch (error) {
             console.error("Error deleting todo:", error);
@@ -71,6 +68,12 @@ const TodoList = () => {
     return (
         <div className="todo-list">
             <h1>To-Do List</h1>
+            <div className="task-header">
+                <span>Task</span>
+                <span>Category</span>
+                <span>Priority</span>
+                <span>Due Date</span>
+            </div>
             <input
                 type="text"
                 value={newTodo}
@@ -93,7 +96,7 @@ const TodoList = () => {
                 <option value="Medium">Medium</option>
                 <option value="Low">Low</option>
             </select>
-            <button className="add-btn" onClick={addTodo}>Add</button>
+            <button onClick={addTodo}>Add</button>
 
             <h2>Search and Filter</h2>
             <input
@@ -115,12 +118,6 @@ const TodoList = () => {
                 <option value="Low">Low</option>
             </select>
 
-            <div className="task-header">
-                <span>Task</span>
-                <span>Category</span>
-                <span>Priority</span>
-                <span>Due Date</span>
-            </div>
             <ul>
                 {filteredTodos.map(todo => (
                     <li key={todo.id}>
