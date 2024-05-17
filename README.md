@@ -37,46 +37,50 @@ Follow these instructions to set up and run the project locally.
    git clone https://github.com/yourusername/todo-list-frontend.git
    cd todo-list-frontend
 
-Install dependencies:
-
-bash
-Copy code
+2. Install dependencies::
+````
 npm install
 # or
 yarn install
-Create a .env file in the root directory and add the following:
+````
+3. Create a .env file in the root directory and add the following:
 
-plaintext
-Copy code
+````
 REACT_APP_API_URL=https://to-do-martik-78cca75b2965.herokuapp.com
-Start the development server:
+``````
 
-bash
-Copy code
+4. Start the development server:
+````
 npm start
 # or
 yarn start
-Deployment
+````
+
+### Deployment
 The project is deployed using AWS Amplify. Follow these steps to deploy your own instance:
 
-Install the AWS Amplify CLI:
-
-bash
-Copy code
+1. Install the AWS Amplify CLI:t.
+````
 npm install -g @aws-amplify/cli
-Initialize a new Amplify project:
-
-bash
-Copy code
+````
+2. Install the AWS Amplify CLI:t.
+````
 amplify init
-Deploy the project:
 
-bash
-Copy code
+````
+3. Install the AWS Amplify CLI:t.
+````
 amplify publish
-Usage
-Open the application in your browser.
-Add, update, and delete todo items as needed.
-Use the filters to manage your todo list more effectively.
-Contributing
+````
+
+### Usage
+- Open the application in your browser.
+- Add, update, and delete todo items as needed.
+- Use the filters to manage your todo list more effectively.
+### Contributing
 Contributions are welcome! Please fork the repository and submit a pull request.
+````
+
+This `README.md` provides a comprehensive guide for setting up, running, and deploying the Todo List frontend application, as well as information about the features, technologies used, and how to contribute to the project.
+
+````
