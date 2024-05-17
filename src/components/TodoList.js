@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
 import './TodoList.css';
 
@@ -9,10 +9,14 @@ const TodoList = () => {
     const [category, setCategory] = useState('');
     const [priority, setPriority] = useState('Medium');
     const [searchText, setSearchText] = useState('');
-    const [filterCategory, setFilterCategory] = useState('');
-    const [filterPriority, setFilterPriority] = useState('');
+    const [filterCategory, setFilterCategory] = useState([]);
+    const [filterPriority, setFilterPriority] = useState([]);
+    const [showCategoryDropdown, setShowCategoryDropdown] = useState(false);
+    const [showPriorityDropdown, setShowPriorityDropdown] = useState(false);
 
     const baseURL = 'https://to-do-martik-78cca75b2965.herokuapp.com';
+    const categoryDropdownRef = useRef(null);
+    const priorityDropdownRef = useRef(null);
 
     useEffect(() => {
         const fetchTodos = async () => {
@@ -25,6 +29,22 @@ const TodoList = () => {
         };
 
         fetchTodos();
+    }, []);
+
+    const handleClickOutside = (event) => {
+        if (categoryDropdownRef.current && !categoryDropdownRef.current.contains(event.target)) {
+            setShowCategoryDropdown(false);
+        }
+        if (priorityDropdownRef.current && !priorityDropdownRef.current.contains(event.target)) {
+            setShowPriorityDropdown(false);
+        }
+    };
+
+    useEffect(() => {
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => {
+            document.removeEventListener('mousedown', handleClickOutside);
+        };
     }, []);
 
     const addTodo = async () => {
@@ -59,11 +79,30 @@ const TodoList = () => {
         }
     };
 
+    const handleCategoryChange = (category) => {
+        if (filterCategory.includes(category)) {
+            setFilterCategory(filterCategory.filter(c => c !== category));
+        } else {
+            setFilterCategory([...filterCategory, category]);
+        }
+    };
+
+    const handlePriorityChange = (priority) => {
+        if (filterPriority.includes(priority)) {
+            setFilterPriority(filterPriority.filter(p => p !== priority));
+        } else {
+            setFilterPriority([...filterPriority, priority]);
+        }
+    };
+
     const filteredTodos = todos.filter(todo =>
         todo.text.toLowerCase().includes(searchText.toLowerCase()) &&
-        (!filterCategory || todo.category === filterCategory) &&
-        (!filterPriority || todo.priority === filterPriority)
+        (filterCategory.length === 0 || filterCategory.includes(todo.category)) &&
+        (filterPriority.length === 0 || filterPriority.includes(todo.priority))
     );
+
+    const uniqueCategories = [...new Set(todos.map(todo => todo.category).filter(c => c))];
+    const uniquePriorities = ['High', 'Medium', 'Low'];
 
     return (
         <div className="todo-list">
@@ -75,15 +114,15 @@ const TodoList = () => {
                 placeholder="Add a new task"
             />
             <input
-                type="date"
-                value={dueDate}
-                onChange={(e) => setDueDate(e.target.value)}
-            />
-            <input
                 type="text"
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
                 placeholder="Category"
+            />
+            <input
+                type="date"
+                value={dueDate}
+                onChange={(e) => setDueDate(e.target.value)}
             />
             <select value={priority} onChange={(e) => setPriority(e.target.value)}>
                 <option value="High">High</option>
@@ -99,18 +138,52 @@ const TodoList = () => {
                 onChange={(e) => setSearchText(e.target.value)}
                 placeholder="Search tasks"
             />
-            <input
-                type="text"
-                value={filterCategory}
-                onChange={(e) => setFilterCategory(e.target.value)}
-                placeholder="Filter by category"
-            />
-            <select value={filterPriority} onChange={(e) => setFilterPriority(e.target.value)}>
-                <option value="">All</option>
-                <option value="High">High</option>
-                <option value="Medium">Medium</option>
-                <option value="Low">Low</option>
-            </select>
+            <div className="filter-container">
+                <div ref={categoryDropdownRef} className="dropdown">
+                    <button
+                        className="dropdown-button"
+                        onClick={() => setShowCategoryDropdown(!showCategoryDropdown)}
+                    >
+                        Filter by Category
+                    </button>
+                    {showCategoryDropdown && (
+                        <div className="dropdown-menu">
+                            {uniqueCategories.map(category => (
+                                <label key={category}>
+                                    <input
+                                        type="checkbox"
+                                        checked={filterCategory.includes(category)}
+                                        onChange={() => handleCategoryChange(category)}
+                                    />
+                                    {category}
+                                </label>
+                            ))}
+                        </div>
+                    )}
+                </div>
+                <div ref={priorityDropdownRef} className="dropdown">
+                    <button
+                        className="dropdown-button"
+                        onClick={() => setShowPriorityDropdown(!showPriorityDropdown)}
+                    >
+                        Filter by Priority
+                    </button>
+                    {showPriorityDropdown && (
+                        <div className="dropdown-menu">
+                            {uniquePriorities.map(priority => (
+                                <label key={priority}>
+                                    <input
+                                        type="checkbox"
+                                        checked={filterPriority.includes(priority)}
+                                        onChange={() => handlePriorityChange(priority)}
+                                    />
+                                    {priority}
+                                </label>
+                            ))}
+                        </div>
+                    )}
+                </div>
+            </div>
 
             <div className="task-header">
                 <span>Task</span>
@@ -123,7 +196,7 @@ const TodoList = () => {
                 {filteredTodos.map(todo => (
                     <li key={todo.id}>
                         <span
-                            style={{ textDecoration: todo.completed ? 'line-through' : 'none' }}
+                            style={{textDecoration: todo.completed ? 'line-through' : 'none'}}
                             onClick={() => toggleComplete(todo.id, todo.completed)}
                         >
                             {todo.text}
